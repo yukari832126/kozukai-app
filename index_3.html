@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>こづかいちょう</title>
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :root {
+    --pink: #ffb8d1;
+    --pink-light: #ffe0ec;
+    --pink-deep: #ff8fb1;
+    --yellow: #ffe27a;
+    --yellow-light: #fff4c4;
+    --mint: #a8e6cf;
+    --mint-light: #d4f5e6;
+    --blue: #a8d8ff;
+    --blue-light: #d6ecff;
+    --purple: #d4b8ff;
+    --purple-light: #ebdfff;
+    --orange: #ffc89b;
+    --cream: #fff9ed;
+    --text: #5a4a6a;
+    --text-soft: #8a7a9a;
+    --shadow: 0 4px 0 rgba(90, 74, 106, 0.15);
+    --shadow-deep: 0 6px 0 rgba(90, 74, 106, 0.2);
+  }
+
+  html, body {
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: 'M PLUS Rounded 1c', 'Kosugi Maru', sans-serif;
+    background:
+      radial-gradient(circle at 10% 20%, var(--pink-light) 0%, transparent 40%),
+      radial-gradient(circle at 90% 10%, var(--yellow-light) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, var(--blue-light) 0%, transparent 40%),
+      radial-gradient(circle at 20% 90%, var(--mint-light) 0%, transparent 40%),
+      var(--cream);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--text);
+    font-weight: 500;
+    padding-bottom: 100px;
+    position: relative;
+  }
+
+  /* ふわふわの背景装飾 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 15% 15%, rgba(255, 184, 209, 0.3) 0%, transparent 8%),
+      radial-gradient(circle at 85% 25%, rgba(168, 230, 207, 0.3) 0%, transparent 6%),
+      radial-gradient(circle at 25% 75%, rgba(255, 226, 122, 0.3) 0%, transparent 7%),
+      radial-gradient(circle at 75% 65%, rgba(212, 184, 255, 0.3) 0%, transparent 6%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 18px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ヘッダー */
+  .app-header {
+    text-align: center;
+    padding: 16px 0 24px;
+  }
+
+  .app-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .app-title .coin {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #ffd45e, #ffb938);
+    border-radius: 50%;
+    border: 3px solid #e09d1e;
+    position: relative;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.1);
+    animation: bounce 2s ease-in-out infinite;
+  }
+  .app-title .coin::after {
+    content: '¥';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 900;
+    font-size: 18px;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.2);
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-4px) rotate(5deg); }
+  }
+
+  /* ページ切り替え */
+  .page {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .page.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* メインカード（合計金額） */
+  .total-card {
+    background: linear-gradient(135deg, #fff 0%, var(--pink-light) 100%);
+    border-radius: 32px;
+    padding: 28px 24px;
+    border: 4px solid #fff;
+    box-shadow: var(--shadow-deep), 0 0 0 4px var(--pink);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .total-card::before {
+    content: '✨';
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    font-size: 24px;
+    animation: twinkle 2s ease-in-out infinite;
+  }
+  .total-card::after {
+    content: '⭐';
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 24px;
+    animation: twinkle 2s ease-in-out infinite 0.5s;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { transform: scale(1) rotate(0); opacity: 1; }
+    50% { transform: scale(1.2) rotate(15deg); opacity: 0.7; }
+  }
+
+  .total-label {
+    font-size: 16px;
+    color: var(--text-soft);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .month-display {
+    font-size: 14px;
+    color: var(--pink-deep);
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .total-amount {
+    font-size: 56px;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1;
+    margin: 8px 0;
+    text-shadow: 2px 2px 0 var(--pink);
+  }
+  .total-amount .yen {
+    font-size: 32px;
+    margin-left: 4px;
+  }
+
+  /* 月切り替え */
+  .month-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 14px;
+  }
+  .month-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    background: var(--pink);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 3px 0 var(--pink-deep);
+    transition: transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .month-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--pink-deep);
+  }
+  .current-month {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    min-width: 100px;
+    text-align: center;
+  }
+
+  /* 統計カード */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 18px 14px;
+    text-align: center;
+    border: 3px solid;
+    box-shadow: var(--shadow);
+  }
+  .stat-card.help { border-color: var(--mint); background: linear-gradient(135deg, #fff, var(--mint-light)); }
+  .stat-card.test { border-color: var(--blue); background: linear-gradient(135deg, #fff, var(--blue-light)); }
+
+  .stat-icon {
+    font-size: 32px;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-soft);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--text);
+  }
+  .stat-value .unit {
+    font-size: 14px;
+    margin-left: 2px;
+  }
+
+  /* 大きいボタン */
+  .big-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .big-btn {
+    border: none;
+    border-radius: 28px;
+    padding: 24px 12px;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: var(--shadow-deep);
+    transition: transform 0.1s, box-shadow 0.1s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    border: 4px solid #fff;
+  }
+  .big-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 rgba(90, 74, 106, 0.2);
+  }
+  .big-btn .emoji { font-size: 40px; line-height: 1; }
+  .big-btn.help { background: linear-gradient(135deg, var(--mint), var(--mint-light)); }
+  .big-btn.test { background: linear-gradient(135deg, var(--yellow), var(--yellow-light)); }
+
+  /* リスト見るボタン */
+  .secondary-btn {
+    width: 100%;
+    background: #fff;
+    border: 3px solid var(--purple);
+    border-radius: 24px;
+    padding: 16px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .secondary-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(90, 74, 106, 0.15);
+  }
+
+  /* 入力フォーム */
+  .form-card {
+    background: #fff;
+    border-radius: 28px;
+    padding: 24px 20px;
+    border: 4px solid #fff;
+    box-shadow: var(--shadow-deep), 0 0 0 4px var(--mint);
+    margin-bottom: 20px;
+  }
+  .form-card.test-form {
+    box-shadow: var(--shadow-deep), 0 0 0 4px var(--blue);
+  }
+
+  .form-title {
+    font-size: 22px;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .form-input, .form-select {
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+    font-family: inherit;
+    font-weight: 700;
+    color: var(--text);
+    border: 3px solid var(--pink-light);
+    border-radius: 18px;
+    background: #fff;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--pink);
+  }
+
+  .form-select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><path fill='%23ff8fb1' d='M10 13l-5-5h10z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 44px;
+  }
+
+  /* お手伝い選択ボタン */
+  .help-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .help-option {
+    background: #fff;
+    border: 3px solid var(--mint-light);
+    border-radius: 20px;
+    padding: 14px 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .help-option .help-emoji { font-size: 28px; }
+  .help-option .help-price {
+    font-size: 16px;
+    color: var(--pink-deep);
+    font-weight: 900;
+  }
+  .help-option.selected {
+    background: linear-gradient(135deg, var(--mint-light), #fff);
+    border-color: var(--mint);
+    transform: scale(1.03);
+    box-shadow: 0 3px 0 var(--mint);
+  }
+  .help-option:active { transform: scale(0.97); }
+
+  /* 教科選択 */
+  .subject-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .subject-option {
+    background: #fff;
+    border: 3px solid var(--blue-light);
+    border-radius: 20px;
+    padding: 14px 8px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .subject-option .sub-emoji { font-size: 22px; }
+  .subject-option.selected {
+    background: linear-gradient(135deg, var(--blue-light), #fff);
+    border-color: var(--blue);
+    transform: scale(1.03);
+    box-shadow: 0 3px 0 var(--blue);
+  }
+  .subject-option:active { transform: scale(0.97); }
+
+  /* 点数表示 */
+  .score-preview {
+    background: linear-gradient(135deg, var(--yellow-light), #fff);
+    border: 3px dashed var(--yellow);
+    border-radius: 20px;
+    padding: 16px;
+    text-align: center;
+    margin-top: 8px;
+  }
+  .score-preview-label {
+    font-size: 14px;
+    color: var(--text-soft);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .score-preview-amount {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--pink-deep);
+  }
+  .score-preview-amount .yen { font-size: 18px; }
+
+  /* 保存ボタン */
+  .save-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--pink), var(--pink-deep));
+    color: #fff;
+    border: 4px solid #fff;
+    border-radius: 28px;
+    padding: 20px;
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: var(--shadow-deep), 0 0 0 4px var(--pink);
+    margin-top: 8px;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.1);
+  }
+  .save-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 rgba(90, 74, 106, 0.2), 0 0 0 4px var(--pink);
+  }
+  .save-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* 戻るボタン */
+  .back-btn {
+    background: #fff;
+    border: 3px solid var(--purple);
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+    cursor: pointer;
+    margin-bottom: 16px;
+    box-shadow: 0 3px 0 var(--purple);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--purple);
+  }
+
+  /* 記録一覧 */
+  .record-item {
+    background: #fff;
+    border-radius: 20px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 3px solid #fff;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .record-item.help-record { border-color: var(--mint); }
+  .record-item.test-record { border-color: var(--blue); }
+
+  .record-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .record-icon.help { background: var(--mint-light); }
+  .record-icon.test { background: var(--blue-light); }
+
+  .record-body { flex: 1; min-width: 0; }
+  .record-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .record-date {
+    font-size: 12px;
+    color: var(--text-soft);
+    font-weight: 600;
+  }
+
+  .record-amount {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--pink-deep);
+    flex-shrink: 0;
+  }
+
+  .delete-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--pink-light);
+    background: #fff;
+    color: var(--pink-deep);
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .delete-btn:active { background: var(--pink-light); }
+
+  /* 空の状態 */
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-soft);
+  }
+  .empty-state .empty-emoji {
+    font-size: 60px;
+    margin-bottom: 12px;
+    display: block;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  .empty-state-text {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  /* セクション見出し */
+  .section-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--text);
+    margin: 16px 4px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* タブ */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: #fff;
+    padding: 6px;
+    border-radius: 50px;
+    box-shadow: var(--shadow);
+  }
+  .tab {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-soft);
+    cursor: pointer;
+    border-radius: 50px;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, var(--pink), var(--pink-deep));
+    color: #fff;
+    box-shadow: 0 2px 0 var(--pink-deep);
+  }
+
+  /* トースト通知 */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    background: linear-gradient(135deg, var(--mint), #7dd9b3);
+    color: #fff;
+    padding: 16px 28px;
+    border-radius: 50px;
+    font-weight: 900;
+    font-size: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    z-index: 1000;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 3px solid #fff;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.1);
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* 紙吹雪 */
+  .confetti {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+    z-index: 999;
+    animation: fall 1.5s linear forwards;
+  }
+  @keyframes fall {
+    0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* レスポンシブ */
+  @media (min-width: 600px) {
+    .total-amount { font-size: 64px; }
+    .help-options, .subject-options { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  /* スクロールバー */
+  ::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <h1 class="app-title">
+      <span class="coin"></span>
+      こづかいちょう
+    </h1>
+  </header>
+
+  <!-- ホーム画面 -->
+  <div id="page-home" class="page active">
+    <div class="total-card">
+      <div class="total-label">こんげつのおこづかい</div>
+      <div class="month-display" id="home-month-display"></div>
+      <div class="total-amount"><span id="total-amount">0</span><span class="yen">円</span></div>
+      <div class="month-switcher">
+        <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+        <div class="current-month" id="current-month"></div>
+        <button class="month-btn" onclick="changeMonth(1)">›</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card help">
+        <div class="stat-icon">🧹</div>
+        <div class="stat-label">おてつだい</div>
+        <div class="stat-value"><span id="help-count">0</span><span class="unit">回</span></div>
+      </div>
+      <div class="stat-card test">
+        <div class="stat-icon">📝</div>
+        <div class="stat-label">テスト</div>
+        <div class="stat-value"><span id="test-count">0</span><span class="unit">回</span></div>
+      </div>
+    </div>
+
+    <div class="big-buttons">
+      <button class="big-btn help" onclick="showPage('help')">
+        <span class="emoji">🧹</span>
+        おてつだい<br>を にゅうりょく
+      </button>
+      <button class="big-btn test" onclick="showPage('test')">
+        <span class="emoji">📝</span>
+        テスト<br>を にゅうりょく
+      </button>
+    </div>
+
+    <button class="secondary-btn" onclick="showPage('list')">
+      📋 きろくを みる
+    </button>
+  </div>
+
+  <!-- お手伝い入力画面 -->
+  <div id="page-help" class="page">
+    <button class="back-btn" onclick="showPage('home')">← もどる</button>
+
+    <div class="form-card">
+      <h2 class="form-title">🧹 おてつだい</h2>
+
+      <div class="form-group">
+        <label class="form-label">📅 ひづけ</label>
+        <input type="date" class="form-input" id="help-date">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">✨ なにを した？</label>
+        <div class="help-options" id="help-options"></div>
+      </div>
+
+      <button class="save-btn" id="help-save-btn" onclick="saveHelp()" disabled>
+        💾 ほぞんする
+      </button>
+    </div>
+  </div>
+
+  <!-- テスト入力画面 -->
+  <div id="page-test" class="page">
+    <button class="back-btn" onclick="showPage('home')">← もどる</button>
+
+    <div class="form-card test-form">
+      <h2 class="form-title">📝 テスト</h2>
+
+      <div class="form-group">
+        <label class="form-label">📅 ひづけ</label>
+        <input type="date" class="form-input" id="test-date">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">📚 きょうか</label>
+        <div class="subject-options" id="subject-options"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">💯 てんすう</label>
+        <input type="number" class="form-input" id="test-score" min="0" max="100" placeholder="0〜100" oninput="updateScorePreview()">
+      </div>
+
+      <div class="score-preview">
+        <div class="score-preview-label">もらえる おこづかい</div>
+        <div class="score-preview-amount"><span id="score-amount">0</span><span class="yen">円</span></div>
+      </div>
+
+      <button class="save-btn" id="test-save-btn" onclick="saveTest()" disabled style="margin-top: 18px;">
+        💾 ほぞんする
+      </button>
+    </div>
+  </div>
+
+  <!-- 記録一覧 -->
+  <div id="page-list" class="page">
+    <button class="back-btn" onclick="showPage('home')">← もどる</button>
+
+    <h2 class="section-title">📋 きろく いちらん</h2>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('all', this)">すべて</button>
+      <button class="tab" onclick="switchTab('help', this)">おてつだい</button>
+      <button class="tab" onclick="switchTab('test', this)">テスト</button>
+    </div>
+
+    <div id="record-list"></div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  // ============================
+  // データ定義（後で親モードで編集できるようにここに集約）
+  // ============================
+  const DEFAULT_HELP_ITEMS = [
+    { id: 'desk',     label: '机をふく',         emoji: '🪑', amount: 20 },
+    { id: 'bath',     label: 'お風呂そうじ',     emoji: '🛁', amount: 50 },
+    { id: 'entrance', label: '玄関そうじ',       emoji: '🚪', amount: 50 },
+    { id: 'dish',     label: '食器をさげる',     emoji: '🍽️', amount: 20 },
+    { id: 'trash',    label: 'ゴミ捨て',         emoji: '🗑️', amount: 10 },
+    { id: 'other',    label: 'その他',           emoji: '✨', amount: 10 }
+  ];
+
+  const DEFAULT_TEST_RULES = [
+    { min: 100, max: 100, amount: 100 },
+    { min: 90,  max: 99,  amount: 50 },
+    { min: 80,  max: 89,  amount: 30 },
+    { min: 0,   max: 79,  amount: 0 }
+  ];
+
+  const SUBJECTS = [
+    { id: 'kokugo', label: 'こくご', emoji: '📖' },
+    { id: 'sansu',  label: 'さんすう', emoji: '🔢' },
+    { id: 'rika',   label: 'りか',   emoji: '🔬' },
+    { id: 'shakai', label: 'しゃかい', emoji: '🌍' },
+    { id: 'eigo',   label: 'えいご', emoji: '🔤' },
+    { id: 'other',  label: 'その他', emoji: '✏️' }
+  ];
+
+  // ============================
+  // 状態管理
+  // ============================
+  let state = {
+    records: [],
+    settings: {
+      helpItems: DEFAULT_HELP_ITEMS,
+      testRules: DEFAULT_TEST_RULES
+    },
+    currentMonth: new Date(),
+    selectedHelpId: null,
+    selectedSubjectId: null,
+    listFilter: 'all'
+  };
+
+  const STORAGE_KEY = 'kozukai_app_data_v1';
+
+  // ============================
+  // データ保存・読み込み
+  // ============================
+  function loadData() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        state.records = data.records || [];
+        // 設定がある場合はマージ（将来の親モード用）
+        if (data.settings) {
+          state.settings = {
+            helpItems: data.settings.helpItems || DEFAULT_HELP_ITEMS,
+            testRules: data.settings.testRules || DEFAULT_TEST_RULES
+          };
+        }
+      }
+    } catch (e) {
+      console.error('読み込みエラー:', e);
+    }
+  }
+
+  function saveData() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        records: state.records,
+        settings: state.settings
+      }));
+    } catch (e) {
+      console.error('保存エラー:', e);
+    }
+  }
+
+  // ============================
+  // 計算ロジック
+  // ============================
+  function calcTestAmount(score) {
+    const num = parseInt(score, 10);
+    if (isNaN(num)) return 0;
+    for (const rule of state.settings.testRules) {
+      if (num >= rule.min && num <= rule.max) return rule.amount;
+    }
+    return 0;
+  }
+
+  function getMonthRecords(date) {
+    const y = date.getFullYear();
+    const m = date.getMonth();
+    return state.records.filter(r => {
+      const d = new Date(r.date);
+      return d.getFullYear() === y && d.getMonth() === m;
+    });
+  }
+
+  function getMonthStats(date) {
+    const records = getMonthRecords(date);
+    const helps = records.filter(r => r.type === 'help');
+    const tests = records.filter(r => r.type === 'test');
+    const helpTotal = helps.reduce((sum, r) => sum + r.amount, 0);
+    const testTotal = tests.reduce((sum, r) => sum + r.amount, 0);
+    return {
+      helpCount: helps.length,
+      testCount: tests.length,
+      helpTotal,
+      testTotal,
+      total: helpTotal + testTotal
+    };
+  }
+
+  // ============================
+  // ページ切り替え
+  // ============================
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (name === 'home') renderHome();
+    if (name === 'help') initHelpForm();
+    if (name === 'test') initTestForm();
+    if (name === 'list') renderList();
+  }
+
+  // ============================
+  // ホーム画面
+  // ============================
+  function renderHome() {
+    const stats = getMonthStats(state.currentMonth);
+    document.getElementById('total-amount').textContent = stats.total.toLocaleString();
+    document.getElementById('help-count').textContent = stats.helpCount;
+    document.getElementById('test-count').textContent = stats.testCount;
+
+    const y = state.currentMonth.getFullYear();
+    const m = state.currentMonth.getMonth() + 1;
+    document.getElementById('current-month').textContent = `${y}年 ${m}月`;
+    document.getElementById('home-month-display').textContent = `${m}月のごうけい`;
+  }
+
+  function changeMonth(diff) {
+    const newDate = new Date(state.currentMonth);
+    newDate.setMonth(newDate.getMonth() + diff);
+    state.currentMonth = newDate;
+    renderHome();
+  }
+
+  // ============================
+  // お手伝いフォーム
+  // ============================
+  function initHelpForm() {
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById('help-date').value = today;
+    state.selectedHelpId = null;
+
+    const container = document.getElementById('help-options');
+    container.innerHTML = state.settings.helpItems.map(item => `
+      <button class="help-option" data-id="${item.id}" onclick="selectHelp('${item.id}')">
+        <span class="help-emoji">${item.emoji}</span>
+        <span>${item.label}</span>
+        <span class="help-price">${item.amount}円</span>
+      </button>
+    `).join('');
+
+    document.getElementById('help-save-btn').disabled = true;
+  }
+
+  function selectHelp(id) {
+    state.selectedHelpId = id;
+    document.querySelectorAll('.help-option').forEach(el => {
+      el.classList.toggle('selected', el.dataset.id === id);
+    });
+    document.getElementById('help-save-btn').disabled = false;
+  }
+
+  function saveHelp() {
+    const date = document.getElementById('help-date').value;
+    if (!date || !state.selectedHelpId) return;
+
+    const item = state.settings.helpItems.find(i => i.id === state.selectedHelpId);
+    if (!item) return;
+
+    state.records.push({
+      id: 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      type: 'help',
+      date: date,
+      helpId: item.id,
+      label: item.label,
+      emoji: item.emoji,
+      amount: item.amount,
+      createdAt: Date.now()
+    });
+
+    saveData();
+    showToast(`✨ ${item.amount}円 ためたよ！`, 'success');
+    fireConfetti();
+    setTimeout(() => showPage('home'), 800);
+  }
+
+  // ============================
+  // テストフォーム
+  // ============================
+  function initTestForm() {
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById('test-date').value = today;
+    document.getElementById('test-score').value = '';
+    document.getElementById('score-amount').textContent = '0';
+    state.selectedSubjectId = null;
+
+    const container = document.getElementById('subject-options');
+    container.innerHTML = SUBJECTS.map(s => `
+      <button class="subject-option" data-id="${s.id}" onclick="selectSubject('${s.id}')">
+        <span class="sub-emoji">${s.emoji}</span>
+        <span>${s.label}</span>
+      </button>
+    `).join('');
+
+    document.getElementById('test-save-btn').disabled = true;
+  }
+
+  function selectSubject(id) {
+    state.selectedSubjectId = id;
+    document.querySelectorAll('.subject-option').forEach(el => {
+      el.classList.toggle('selected', el.dataset.id === id);
+    });
+    checkTestFormValid();
+  }
+
+  function updateScorePreview() {
+    const score = document.getElementById('test-score').value;
+    const amount = calcTestAmount(score);
+    document.getElementById('score-amount').textContent = amount;
+    checkTestFormValid();
+  }
+
+  function checkTestFormValid() {
+    const date = document.getElementById('test-date').value;
+    const score = document.getElementById('test-score').value;
+    const valid = date && state.selectedSubjectId && score !== '' &&
+                  parseInt(score, 10) >= 0 && parseInt(score, 10) <= 100;
+    document.getElementById('test-save-btn').disabled = !valid;
+  }
+
+  function saveTest() {
+    const date = document.getElementById('test-date').value;
+    const score = parseInt(document.getElementById('test-score').value, 10);
+    if (!date || !state.selectedSubjectId || isNaN(score)) return;
+
+    const subject = SUBJECTS.find(s => s.id === state.selectedSubjectId);
+    const amount = calcTestAmount(score);
+
+    state.records.push({
+      id: 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      type: 'test',
+      date: date,
+      subjectId: subject.id,
+      label: subject.label,
+      emoji: subject.emoji,
+      score: score,
+      amount: amount,
+      createdAt: Date.now()
+    });
+
+    saveData();
+    if (amount > 0) {
+      showToast(`🎉 ${amount}円 ゲット！すごい！`, 'success');
+      fireConfetti();
+    } else {
+      showToast(`📝 きろくしたよ！つぎは がんばろう`, 'info');
+    }
+    setTimeout(() => showPage('home'), 900);
+  }
+
+  // ============================
+  // 記録一覧
+  // ============================
+  function switchTab(filter, btn) {
+    state.listFilter = filter;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderList();
+  }
+
+  function renderList() {
+    const container = document.getElementById('record-list');
+    let records = [...state.records];
+
+    if (state.listFilter !== 'all') {
+      records = records.filter(r => r.type === state.listFilter);
+    }
+
+    records.sort((a, b) => {
+      if (a.date !== b.date) return b.date.localeCompare(a.date);
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
+
+    if (records.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-emoji">🐰</span>
+          <div class="empty-state-text">まだ きろくが ないよ！<br>がんばって ためよう！</div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = records.map(r => {
+      const d = new Date(r.date);
+      const dateStr = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+      const typeLabel = r.type === 'help' ? 'おてつだい' : `テスト・${r.label}`;
+      const detail = r.type === 'help' ? r.label : `${r.score}点`;
+      return `
+        <div class="record-item ${r.type}-record">
+          <div class="record-icon ${r.type}">${r.emoji}</div>
+          <div class="record-body">
+            <div class="record-title">${typeLabel}・${detail}</div>
+            <div class="record-date">${dateStr}</div>
+          </div>
+          <div class="record-amount">${r.amount}円</div>
+          <button class="delete-btn" onclick="deleteRecord('${r.id}')" aria-label="けす">×</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function deleteRecord(id) {
+    if (!confirm('このきろくを けしてもいい？')) return;
+    state.records = state.records.filter(r => r.id !== id);
+    saveData();
+    renderList();
+    showToast('🗑️ けしたよ', 'info');
+  }
+
+  // ============================
+  // トースト & 紙吹雪
+  // ============================
+  let toastTimer = null;
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    if (type === 'info') {
+      toast.style.background = 'linear-gradient(135deg, #a8d8ff, #7ab8e8)';
+    } else {
+      toast.style.background = 'linear-gradient(135deg, #a8e6cf, #7dd9b3)';
+    }
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  function fireConfetti() {
+    const colors = ['#ffb8d1', '#ffe27a', '#a8e6cf', '#a8d8ff', '#d4b8ff', '#ffc89b'];
+    const shapes = ['🎉', '⭐', '✨', '💖', '🌟'];
+    for (let i = 0; i < 18; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti';
+      const useEmoji = Math.random() > 0.5;
+      if (useEmoji) {
+        piece.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+        piece.style.fontSize = (16 + Math.random() * 12) + 'px';
+        piece.style.background = 'transparent';
+      } else {
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '4px';
+      }
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.animationDuration = (1 + Math.random() * 1) + 's';
+      piece.style.animationDelay = (Math.random() * 0.3) + 's';
+      document.body.appendChild(piece);
+      setTimeout(() => piece.remove(), 2500);
+    }
+  }
+
+  // ============================
+  // 初期化
+  // ============================
+  loadData();
+  renderHome();
+</script>
+
+</body>
+</html>
